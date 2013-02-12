@@ -19,6 +19,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     NSMutableDictionary *stateDict;
     NSMutableArray *filteredStateNames;
 }
+@property (strong, nonatomic) IBOutlet UITableView *mainTableView;
 
 @property (strong, nonatomic) BDADetailViewController *detailViewController;
 @property (copy, nonatomic) NSDictionary *names;
@@ -40,6 +41,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
       forCellReuseIdentifier:SectionsTableIdentifier];
     
     filteredStateNames = [NSMutableArray array];
+    
+    // Build the searchbar and SearchDisplay controller
     UISearchBar *searchBar = [[UISearchBar alloc]
                               initWithFrame:CGRectMake(0, 0, 320, 44)];
     tableView.tableHeaderView = searchBar;
@@ -51,19 +54,24 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     self.searchController.searchResultsDataSource = self;
     self.searchController.searchResultsDelegate = self;
     
-    // They should not be nil.
-    //NSLog(@"delegate:%@ dataSource:%@", self.searchController.delegate, self.searchController.searchResultsDataSource);
+    // Scroll the search off the top
+//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:1];
+//    [self.mainTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
     // Instantiate the Data Access object to read the pList
-    dao = [[DataAccessObject alloc] initWithLibraryName:@"states"];
-    
-    self.title = NSLocalizedString(@"States", @"States");
+    if (dao == nil) {
+        // Lazy loading of Data Access object
+        dao = [[DataAccessObject alloc] initWithLibraryName:@"states"];
+    }
+    self.title = NSLocalizedString(@"States", @"States list");
     
     // Retrieve the array of keys from the Data access object
     self.names = [self configureSectionData];
     
+    // Remove row selection highlight
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
 }
 
@@ -71,10 +79,10 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 - (NSDictionary *)configureSectionData {
     
+    // Retrieve the set of letters 
     self.keys = [dao libraryKeys];
-    NSUInteger sectionTitlesCount = [self.keys count];
     
-    stateDict = [NSMutableDictionary dictionaryWithCapacity:sectionTitlesCount];
+    stateDict = [NSMutableDictionary dictionaryWithCapacity:[self.keys count]];
     for (NSString *startingLetter in self.keys)
     {
         NSMutableArray *mutableArray = [[NSMutableArray alloc] initWithObjects: nil];
@@ -86,6 +94,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
         
         // Did we add any states for this letter ?
         if ([mutableArray count] > 0) {
+            
+            // Add the array of state names for the starting alphabetic character 
             [stateDict setObject:mutableArray forKey:startingLetter];
         }
         mutableArray = nil;
@@ -153,27 +163,22 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 {
     static NSString *CellIdentifier = @"StatesCell";
     
-    /*
-    // Create custom cell from NIB file
-    [tableView registerNib:[UINib nibWithNibName:@"BDACellView" bundle:nil] forCellReuseIdentifier:CellIdentifier];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    */
-    
-     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
      
-     if (cell == nil) {
+    if (cell == nil) {
             cell = [[[NSBundle mainBundle] loadNibNamed:@"BDACellView" owner:self options:nil] lastObject];
             UINib *theNib = [UINib nibWithNibName:@"BDACellView" bundle:nil];
             cell = [[theNib instantiateWithOwner:self options:nil] lastObject];
-     }
+    }
     
     // Configure the cell...
     UIImageView *cellFlag = (UIImageView *)[cell viewWithTag:200];
     UILabel *lblState = (UILabel *)[cell viewWithTag:100];
     UILabel *lblCaptial = (UILabel *)[cell viewWithTag:50];
     
+    // Handle population of the main table view cell
     if (tableView.tag == MAIN_TABLEVIEW_TAG) {
-        // Show the disclosure indicators for the search
+        // Hide the disclosure indicators for the search
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
         
@@ -191,6 +196,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     }
     else
     {
+        // Handle the Search results cell value
+        
         // Show the disclosure indicators for the search
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
@@ -216,7 +223,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // Instantiate the Detail view controller
+    // Lazy Instantiation of the Detail view controller
     if (!self.detailViewController) {
         self.detailViewController = [[BDADetailViewController alloc] initWithNibName:@"BDADetailViewController" bundle:nil];
     }

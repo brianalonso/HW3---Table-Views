@@ -13,6 +13,7 @@
 
 - (void)configureView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet UITableView *detailTableView;
 
 @end
 
@@ -34,15 +35,14 @@
 {
     // Update the user interface for the detail item.
 
-    if (self.detailItem) {
-        // Get the state image
-        NSMutableString *strState = [self.detailItem valueForKey:@"name"];
-        
-        // load the large flag image
-        self.imageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-200.png", [strState stringByReplacingOccurrencesOfString:@" " withString:@"_" ]]];
-        
-        self.title = [NSString stringWithFormat:@"%@ (%@)", strState, [self.detailItem valueForKey:@"abbreviation"]];
-    }
+    // Get the state image
+    NSMutableString *strState = [self.detailItem valueForKey:@"name"];
+    
+    // load the large flag image
+    self.imageView.image = [UIImage imageNamed:[NSString stringWithFormat:@"%@-200.png", [strState stringByReplacingOccurrencesOfString:@" " withString:@"_" ]]];
+    
+    self.title = [NSString stringWithFormat:@"%@ (%@)", strState, [self.detailItem valueForKey:@"abbreviation"]];
+    
 }
 
 - (void)viewDidLoad
@@ -50,6 +50,11 @@
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
     [self configureView];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [self.detailTableView reloadData];
 }
 
 #pragma mark - Detail Table View
@@ -86,12 +91,6 @@
     dateFormatter.dateStyle = NSDateFormatterMediumStyle;
     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
     numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
-    
-    /*
-     // Create custom cell from NIB file
-     [tableView registerNib:[UINib nibWithNibName:@"BDACellView" bundle:nil] forCellReuseIdentifier:CellIdentifier];
-     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-     */
     
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
@@ -138,6 +137,14 @@
     return cell;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
+{
+    if (section == 2) {
+        // Set the text for the section footer
+        return @"Population and largest city based on 2010 census data";
+    }
+    return nil;
+}
 
 - (void)didReceiveMemoryWarning
 {

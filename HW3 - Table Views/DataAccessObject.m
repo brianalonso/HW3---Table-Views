@@ -30,7 +30,7 @@
         NSArray *contentArray = [[NSArray alloc] initWithContentsOfFile:[[NSBundle mainBundle]
                                                       pathForResource:self.libraryPlist ofType:@"plist"]];
         
-        // Sort the array
+        // Sort the states array
         NSSortDescriptor* nameSortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"name" ascending:YES];
         self.libraryContent = [contentArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:nameSortDescriptor]];
         

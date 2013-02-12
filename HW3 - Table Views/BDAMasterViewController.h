@@ -10,7 +10,7 @@
 
 @class BDADetailViewController;
 
-@interface BDAMasterViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate, UISearchDisplayDelegate>
+@interface BDAMasterViewController : UITableViewController < UISearchDisplayDelegate>
 
 
 @end
