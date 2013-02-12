@@ -49,6 +49,7 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
    
     self.searchController.delegate = self;
     self.searchController.searchResultsDataSource = self;
+    self.searchController.searchResultsDelegate = self;
     
     // They should not be nil.
     //NSLog(@"delegate:%@ dataSource:%@", self.searchController.delegate, self.searchController.searchResultsDataSource);
