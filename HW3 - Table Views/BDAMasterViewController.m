@@ -55,8 +55,8 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     self.searchController.searchResultsDelegate = self;
     
     // Scroll the search off the top
-//    NSIndexPath *indexPath = [NSIndexPath indexPathForRow:1 inSection:1];
-//    [self.mainTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    //NSIndexPath *indexPath = [NSIndexPath indexPathForRow:0 inSection:1];
+    //[self.mainTableView scrollToRowAtIndexPath:indexPath atScrollPosition:UITableViewScrollPositionTop animated:NO];
     
 }
 
@@ -65,11 +65,11 @@ static NSString *SectionsTableIdentifier = @"SectionsTableIdentifier";
     if (dao == nil) {
         // Lazy loading of Data Access object
         dao = [[DataAccessObject alloc] initWithLibraryName:@"states"];
+        
+        // Retrieve the array of keys from the Data access object
+        self.names = [self configureSectionData];
     }
     self.title = NSLocalizedString(@"States", @"States list");
-    
-    // Retrieve the array of keys from the Data access object
-    self.names = [self configureSectionData];
     
     // Remove row selection highlight
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
